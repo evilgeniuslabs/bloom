@@ -16,5 +16,4 @@ Comes with over 20 patterns built-in.
 
 Programmable over Wi-Fi or micro USB cable.
 
-Firmware and all patterns are fully open-source:
-https://github.com/evilgeniuslabs/bloom
+Wi-Fi Remote Control App: http://evilgeniuslabs.org/bloom
