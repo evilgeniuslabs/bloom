@@ -1,10 +1,20 @@
 # Bloom
-Lamp built with 60 WS2812B RGB LEDs, a Particle Photon, and the FastLED library.
 
-Build your own, or buy one from Evil Genius Labs: http://www.evilgeniuslabs.org
+[Demo Video](https://youtu.be/1ne9Ra7c7DI):
 
-Particle Photon: https://store.particle.io/?product=particle-photon
+[![Demo Video](http://img.youtube.com/vi/1ne9Ra7c7DI/0.jpg)](https://youtu.be/1ne9Ra7c7DI)
 
-FastLED: https://github.com/FastLED/FastLED
+Available from Evil Genius Labs: http://www.evilgeniuslabs.org
 
-Wi-Fi Remote Control App: http://evilgeniuslabs.org/bloom/
+Spherical light art display, built with 60 WS2812B RGB LEDs, controlled with a Particle Photon, using the FastLED library.
+
+This model is about 9.5" in diameter.
+
+Controlled via an app or webpage over Wi-Fi, and/or a wireless infrared remote control.
+
+Comes with over 20 patterns built-in.
+
+Programmable over Wi-Fi or micro USB cable.
+
+Firmware and all patterns are fully open-source:
+https://github.com/evilgeniuslabs/bloom
