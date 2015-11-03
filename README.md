@@ -1,6 +1,8 @@
 # Bloom
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/1ne9Ra7c7DI" frameborder="0" allowfullscreen></iframe>
+[Demo Video](https://youtu.be/1ne9Ra7c7DI):
+
+[![Demo Video](http://img.youtube.com/vi/1ne9Ra7c7DI/0.jpg)](https://youtu.be/1ne9Ra7c7DI)
 
 Available from Evil Genius Labs: http://www.evilgeniuslabs.org
 
