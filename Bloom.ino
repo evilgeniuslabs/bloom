@@ -25,7 +25,18 @@ typedef PatternAndName PatternAndNameList[];
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 
-const PatternAndNameList patterns = {
+const PatternAndNameList patterns =
+{
+  { pulseHeat,              "Pulse Heat" },
+  { pulseSolid,             "Pulse Solid" },
+  { pulseRainbow,           "Pulse Rainbow" },
+  { pulsePalettes,          "Pulse Palettes" },
+  { pulseGradientPalettes,  "Pulse Gradient Palettes" },
+  { ringsHeat,              "Rings Heat" },
+  { ringsSolid,             "Rings Solid" },
+  { ringsRainbow,           "Rings Rainbow" },
+  { ringsPalettes,          "Rings Palettes" },
+  { ringsGradientPalettes,  "Rings Gradient Palettes" },
   { pride,                  "Pride" },
   { colorWaves,             "Color Waves" },
   { rainbowTwinkles,        "Rainbow Twinkles" },
@@ -68,9 +79,10 @@ CRGBPalette16 IceColors_p = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, C
 uint8_t paletteIndex = 0;
 
 // List of palettes to cycle through.
-CRGBPalette16 palettes[] = {
+CRGBPalette16 palettes[] =
+{
   RainbowColors_p,
-  RainbowStripeColors_p,
+  /*RainbowStripeColors_p,*/
   CloudColors_p,
   OceanColors_p,
   ForestColors_p,
@@ -89,7 +101,8 @@ CRGBPalette16 targetPalette = palettes[paletteIndex];
 // 20-120 is better for deployment
 #define SECONDS_PER_PALETTE 20
 
-void setup() {
+void setup()
+{
     FastLED.addLeds<WS2812B, TX, GRB>(leds, NUM_LEDS);
     FastLED.setCorrection(TypicalLEDStrip);
     FastLED.setBrightness(brightness);
@@ -140,7 +153,8 @@ void setup() {
     Particle.variable("variable", variableValue);
 }
 
-void loop() {
+void loop()
+{
     if(power < 1) {
         fill_solid(leds, NUM_LEDS, CRGB::Black);
         FastLED.show();
@@ -161,7 +175,7 @@ void loop() {
         nblendPaletteTowardPalette(currentPalette, targetPalette, 16);
     }
 
-    EVERY_N_MILLISECONDS( 40 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+    EVERY_N_MILLISECONDS( 40 ) { gHue++; } // slowly cycle the "base color" through the rainbow/palette
 
     // slowly change to a new palette
     EVERY_N_SECONDS(SECONDS_PER_PALETTE) {
@@ -199,7 +213,8 @@ int moveVariableCursor(String args)
     return 0;
 }
 
-int setVariable(String args) {
+int setVariable(String args)
+{
     if(args.startsWith("pwr:")) {
         return setPower(args.substring(4));
     }
@@ -231,7 +246,8 @@ int setVariable(String args) {
     return -1;
 }
 
-int setPower(String args) {
+int setPower(String args)
+{
     power = args.toInt();
     if(power < 0)
         power = 0;
@@ -257,7 +273,8 @@ int setBrightness(String args)
     return brightness;
 }
 
-byte parseByte(String args) {
+byte parseByte(String args)
+{
     int c = args.toInt();
     if(c < 0)
         c = 0;
@@ -344,7 +361,8 @@ uint8_t bpm()
   return 8;
 }
 
-uint8_t juggle() {
+uint8_t juggle()
+{
   static uint8_t    numdots =   4; // Number of dots in use.
   static uint8_t   faderate =   2; // How long should the trails be. Very low value = longer trails.
   static uint8_t     hueinc =  255 / numdots - 1; // Incremental change in hue between each dot.
@@ -354,7 +372,7 @@ uint8_t juggle() {
   static uint8_t thisbright = 255; // How bright should the LED/display be.
   static uint8_t   basebeat =   5; // Higher = faster movement.
 
-  /*static uint8_t lastSecond =  99;  // Static variable, means it's only defined once. This is our 'debounce' variable.
+  static uint8_t lastSecond =  99;  // Static variable, means it's only defined once. This is our 'debounce' variable.
   uint8_t secondHand = (millis() / 1000) % 30; // IMPORTANT!!! Change '30' to a different value to change duration of the loop.
 
   if (lastSecond != secondHand) { // Debounce to make sure we're not repeating an assignment.
@@ -365,7 +383,7 @@ uint8_t juggle() {
       case 20: numdots = 8; basebeat =  3; hueinc =  0; faderate = 8; thishue=random8(); break; // Only gets called once, and not continuously for the next several seconds. Therefore, no rainbows.
       case 30: break;
     }
-  }*/
+  }
 
   // Several colored dots, weaving in and out of sync with each other
   curhue = thishue; // Reset the hue values.
@@ -379,19 +397,22 @@ uint8_t juggle() {
   return 0;
 }
 
-uint8_t fire() {
+uint8_t fire()
+{
     heatMap(HeatColors_p, true);
 
     return 30;
 }
 
-uint8_t water() {
+uint8_t water()
+{
     heatMap(IceColors_p, false);
 
     return 30;
 }
 
-uint8_t showSolidColor() {
+uint8_t showSolidColor()
+{
     fill_solid(leds, NUM_LEDS, solidColor);
 
     return 30;
@@ -452,7 +473,8 @@ uint8_t radialPaletteShift()
   return 8;
 }
 
-void heatMap(CRGBPalette16 palette, bool up) {
+void heatMap(CRGBPalette16 palette, bool up)
+{
     fill_solid(leds, NUM_LEDS, CRGB::Black);
 
     // Add entropy to random number generator; we use a lot of it.
@@ -541,6 +563,186 @@ uint8_t gCurrentPaletteNumber = 0;
 CRGBPalette16 gCurrentPalette( CRGB::Black);
 CRGBPalette16 gTargetPalette( gGradientPalettes[0] );
 
+const uint8_t ringCount = 4;
+uint8_t ringLedCounts[ringCount] = { 24, 16, 12, 8 };
+uint8_t ringLedStart[ringCount] =
+{
+  0,
+  ringLedCounts[0],
+  ringLedCounts[0] + ringLedCounts[1],
+  ringLedCounts[0] + ringLedCounts[1] + ringLedCounts[2]
+};
+
+uint8_t _pulse(CRGBPalette16& palette)
+{
+  static uint8_t hue = 0;
+
+  for(uint8_t ringIndex = 0; ringIndex < ringCount; ringIndex++)
+  {
+    uint8_t currentBrightness = beatsin8(30 + ringIndex, 0, 255, 0, ringIndex * (256 / ringCount));
+
+    CRGB color = ColorFromPalette( palette, hue, currentBrightness);
+
+    uint8_t start = ringLedStart[ringIndex];
+    uint8_t count = ringLedCounts[ringIndex];
+    for(uint8_t i = start; i < start + count; i++)
+    {
+      leds[i] = color;
+    }
+  }
+
+  EVERY_N_MILLIS(256) { hue++; }
+
+  return 0;
+}
+
+uint8_t pulseHeat()
+{
+  CRGBPalette16 palette = HeatColors_p;
+
+  return _pulse(palette);
+}
+
+uint8_t pulseSolid()
+{
+  CRGBPalette16 solid = { solidColor };
+
+  return _pulse(solid);
+}
+
+uint8_t pulseRainbow()
+{
+  return _pulse(palettes[0]);
+}
+
+uint8_t pulsePalettes()
+{
+  return _pulse(currentPalette);
+}
+
+uint8_t pulseGradientPalettes()
+{
+  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
+    gCurrentPaletteNumber = addmod8( gCurrentPaletteNumber, 1, gGradientPaletteCount);
+    gTargetPalette = gGradientPalettes[ gCurrentPaletteNumber ];
+  }
+
+  EVERY_N_MILLISECONDS(40) {
+    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 16);
+  }
+
+  return _pulse(gCurrentPalette);
+}
+
+uint8_t beatsaw8( accum88 beats_per_minute, uint8_t lowest = 0, uint8_t highest = 255,
+                            uint32_t timebase = 0, uint8_t phase_offset = 0)
+{
+  uint8_t beat = beat8( beats_per_minute, timebase);
+  uint8_t beatsaw = beat + phase_offset;
+  uint8_t rangewidth = highest - lowest;
+  uint8_t scaledbeat = scale8( beatsaw, rangewidth);
+  uint8_t result = lowest + scaledbeat;
+  return result;
+}
+
+void blurredPixel(uint8_t index, uint8_t blurWidth, CRGBPalette16& palette, uint8_t hue, uint8_t lowest = 0, uint8_t highest = NUM_LEDS)
+{
+  uint8_t val = 255;
+
+  leds[index] = ColorFromPalette( palette, hue, val);
+
+  val /= 2;
+
+  for(int i = 1; i < blurWidth; i++)
+  {
+    uint8_t blurIndex = index + i;
+
+    uint8_t rangewidth = highest - lowest;
+    uint8_t scaledIndex = scale8( blurIndex, rangewidth);
+    uint8_t result = lowest + scaledIndex;
+
+    leds[blurIndex] = ColorFromPalette( palette, hue, val);
+    val /= 2;
+  }
+
+  val = 128;
+
+  for(int i = 1; i < blurWidth; i++)
+  {
+    uint8_t blurIndex = index - i;
+
+    uint8_t rangewidth = highest - lowest;
+    uint8_t scaledIndex = scale8( blurIndex, rangewidth);
+    uint8_t result = lowest + scaledIndex;
+
+    leds[blurIndex] = ColorFromPalette( palette, hue, val);
+    val /= 2;
+  }
+}
+
+uint8_t _rings(CRGBPalette16& palette)
+{
+  const accum88 bpm = 60;
+  static uint8_t sHue = 0;
+
+  uint8_t hue = sHue;
+  uint8_t positionOffset = 0;
+
+  fadeToBlackBy(leds, NUM_LEDS, 255);
+
+  for(uint8_t i = 0; i < ringCount; i++)
+  {
+    uint8_t ringLedCount = ringLedCounts[i];
+    uint8_t ringPosition = beatsaw8(bpm, positionOffset, positionOffset + ringLedCount);
+
+    blurredPixel(ringPosition, 3, palette, hue, positionOffset, positionOffset + ringLedCount);
+
+    /*hue += 256 / ringCount;*/
+    positionOffset += ringLedCount;
+  }
+
+  EVERY_N_MILLISECONDS(125) { sHue++; }
+
+  return 0;
+}
+
+uint8_t ringsHeat()
+{
+  CRGBPalette16 palette = HeatColors_p;
+
+  return _rings(palette);
+}
+
+uint8_t ringsSolid()
+{
+  CRGBPalette16 solid = { solidColor };
+
+  return _rings(solid);
+}
+
+uint8_t ringsRainbow()
+{
+  return _rings(palettes[0]);
+}
+
+uint8_t ringsPalettes()
+{
+  return _rings(currentPalette);
+}
+
+uint8_t ringsGradientPalettes()
+{
+  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
+    gCurrentPaletteNumber = addmod8( gCurrentPaletteNumber, 1, gGradientPaletteCount);
+    gTargetPalette = gGradientPalettes[ gCurrentPaletteNumber ];
+  }
+
+  EVERY_N_MILLISECONDS(40) {
+    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 16);
+  }
+
+  return _rings(gCurrentPalette);
+}
 
 uint8_t colorWaves()
 {
@@ -715,7 +917,8 @@ CRGB makeDarker( const CRGB& color, fract8 howMuchDarker)
 // cycles and about 100 bytes of flash program memory.
 uint8_t  directionFlags[ (NUM_LEDS+7) / 8];
 
-bool getPixelDirection( uint16_t i) {
+bool getPixelDirection( uint16_t i)
+{
   uint16_t index = i / 8;
   uint8_t  bitNum = i & 0x07;
 
@@ -723,7 +926,8 @@ bool getPixelDirection( uint16_t i) {
   return (directionFlags[index] & andMask) != 0;
 }
 
-void setPixelDirection( uint16_t i, bool dir) {
+void setPixelDirection( uint16_t i, bool dir)
+{
   uint16_t index = i / 8;
   uint8_t  bitNum = i & 0x07;
 
