@@ -55,15 +55,13 @@ const PatternAndNameList patterns =
   { showSolidColor,         "Solid Color" }
 };
 
+int patternCount = ARRAY_SIZE(patterns);
+
 // variables exposed via Particle cloud API (Spark Core is limited to 10)
 int brightness = 32;
-int patternCount = ARRAY_SIZE(patterns);
 int patternIndex = 0;
-String patternName = "Pride";
+String patternNames = "";
 int power = 1;
-char variableValue[32] = "";
-
-// variables exposed via the variableValue variable, via Particle Cloud API
 int r = 0;
 int g = 0;
 int b = 255;
@@ -141,16 +139,26 @@ void setup()
     solidColor = CRGB(r, b, g);
 
     Particle.function("patternIndex", setPatternIndex); // sets the current pattern index, changes to the pattern with the specified index
-    Particle.function("pNameCursor", movePatternNameCursor); // moves the pattern name cursor to the specified index, allows getting a list of pattern names
     Particle.function("variable", setVariable); // sets the value of a variable, args are name:value
-    Particle.function("varCursor", moveVariableCursor);
 
     Particle.variable("power", power);
     Particle.variable("brightness", brightness);
-    Particle.variable("patternCount", patternCount);
     Particle.variable("patternIndex", patternIndex);
-    Particle.variable("patternName", patternName);
-    Particle.variable("variable", variableValue);
+  Particle.variable("r", r);
+  Particle.variable("g", g);
+  Particle.variable("b", b);
+
+    patternNames = "[";
+    for(uint8_t i = 0; i < patternCount; i++)
+    {
+      patternNames.concat("\"");
+      patternNames.concat(patterns[i].name);
+      patternNames.concat("\"");
+      if(i < patternCount - 1)
+        patternNames.concat(",");
+    }
+    patternNames.concat("]");
+    Particle.variable("patternNames", patternNames);
 }
 
 void loop()
@@ -183,34 +191,6 @@ void loop()
       if (paletteIndex >= paletteCount) paletteIndex = 0;
       targetPalette = palettes[paletteIndex];
     };
-}
-
-uint8_t variableCursor = 0;
-
-int moveVariableCursor(String args)
-{
-    if(args.startsWith("pwr")) {
-        itoa(power, variableValue, 10);
-        return power;
-    }
-    else if (args.startsWith("brt")) {
-        itoa(brightness, variableValue, 10);
-        return brightness;
-    }
-    else if (args.startsWith("r")) {
-        itoa(r, variableValue, 10);
-        return r;
-    }
-    else if (args.startsWith("g")) {
-        itoa(g, variableValue, 10);
-        return g;
-    }
-    else if (args.startsWith("b")) {
-        itoa(b, variableValue, 10);
-        return b;
-    }
-
-    return 0;
 }
 
 int setVariable(String args)
@@ -295,19 +275,6 @@ int setPatternIndex(String args)
     EEPROM.write(1, patternIndex);
 
     return patternIndex;
-}
-
-int movePatternNameCursor(String args)
-{
-    int index = args.toInt();
-    if(index < 0)
-        index = 0;
-    else if (index >= patternCount)
-        index = patternCount - 1;
-
-    patternName = patterns[index].name;
-
-    return index;
 }
 
 uint8_t rainbow()
