@@ -14,7 +14,7 @@ extern char* itoa(int a, char* buffer, unsigned char radix);
 
 #define ONE_DAY_MILLIS (24 * 60 * 60 * 1000)
 
-#define NUM_LEDS 60
+#define NUM_LEDS 30
 
 CRGB leds[NUM_LEDS];
 
@@ -97,11 +97,11 @@ CRGBPalette16 targetPalette = palettes[paletteIndex];
 
 // ten seconds per color palette makes a good demo
 // 20-120 is better for deployment
-#define SECONDS_PER_PALETTE 20
+#define SECONDS_PER_PALETTE 10
 
 void setup()
 {
-    FastLED.addLeds<WS2812B, TX, GRB>(leds, NUM_LEDS);
+    FastLED.addLeds<WS2812B, TX>(leds, NUM_LEDS);
     FastLED.setCorrection(TypicalLEDStrip);
     FastLED.setBrightness(brightness);
     FastLED.setDither(false);
