@@ -27,16 +27,6 @@ typedef PatternAndName PatternAndNameList[];
 
 const PatternAndNameList patterns =
 {
-  { pulseHeat,              "Pulse Heat" },
-  { pulseSolid,             "Pulse Solid" },
-  { pulseRainbow,           "Pulse Rainbow" },
-  { pulsePalettes,          "Pulse Palettes" },
-  { pulseGradientPalettes,  "Pulse Gradient Palettes" },
-  { ringsHeat,              "Rings Heat" },
-  { ringsSolid,             "Rings Solid" },
-  { ringsRainbow,           "Rings Rainbow" },
-  { ringsPalettes,          "Rings Palettes" },
-  { ringsGradientPalettes,  "Rings Gradient Palettes" },
   { pride,                  "Pride" },
   { colorWaves,             "Color Waves" },
   { rainbowTwinkles,        "Rainbow Twinkles" },
@@ -70,8 +60,6 @@ uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
 CRGB solidColor = CRGB(r, g, b);
 
-int offlinePin = D7;
-
 CRGBPalette16 IceColors_p = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::White);
 
 uint8_t paletteIndex = 0;
@@ -101,7 +89,7 @@ CRGBPalette16 targetPalette = palettes[paletteIndex];
 
 void setup()
 {
-    FastLED.addLeds<WS2812B, TX>(leds, NUM_LEDS);
+    FastLED.addLeds<WS2812B, TX>(leds, NUM_LEDS, GRB);
     FastLED.setCorrection(TypicalLEDStrip);
     FastLED.setBrightness(brightness);
     FastLED.setDither(false);
@@ -144,9 +132,9 @@ void setup()
     Particle.variable("power", power);
     Particle.variable("brightness", brightness);
     Particle.variable("patternIndex", patternIndex);
-  Particle.variable("r", r);
-  Particle.variable("g", g);
-  Particle.variable("b", b);
+    Particle.variable("r", r);
+    Particle.variable("g", g);
+    Particle.variable("b", b);
 
     patternNames = "[";
     for(uint8_t i = 0; i < patternCount; i++)
@@ -530,77 +518,6 @@ uint8_t gCurrentPaletteNumber = 0;
 CRGBPalette16 gCurrentPalette( CRGB::Black);
 CRGBPalette16 gTargetPalette( gGradientPalettes[0] );
 
-const uint8_t ringCount = 4;
-uint8_t ringLedCounts[ringCount] = { 24, 16, 12, 8 };
-uint8_t ringLedStart[ringCount] =
-{
-  0,
-  ringLedCounts[0],
-  ringLedCounts[0] + ringLedCounts[1],
-  ringLedCounts[0] + ringLedCounts[1] + ringLedCounts[2]
-};
-
-uint8_t _pulse(CRGBPalette16& palette)
-{
-  static uint8_t hue = 0;
-
-  for(uint8_t ringIndex = 0; ringIndex < ringCount; ringIndex++)
-  {
-    uint8_t currentBrightness = beatsin8(30 + ringIndex, 0, 255, 0, ringIndex * (256 / ringCount));
-
-    CRGB color = ColorFromPalette( palette, hue, currentBrightness);
-
-    uint8_t start = ringLedStart[ringIndex];
-    uint8_t count = ringLedCounts[ringIndex];
-    for(uint8_t i = start; i < start + count; i++)
-    {
-      leds[i] = color;
-    }
-  }
-
-  EVERY_N_MILLIS(256) { hue++; }
-
-  return 0;
-}
-
-uint8_t pulseHeat()
-{
-  CRGBPalette16 palette = HeatColors_p;
-
-  return _pulse(palette);
-}
-
-uint8_t pulseSolid()
-{
-  CRGBPalette16 solid = { solidColor };
-
-  return _pulse(solid);
-}
-
-uint8_t pulseRainbow()
-{
-  return _pulse(palettes[0]);
-}
-
-uint8_t pulsePalettes()
-{
-  return _pulse(currentPalette);
-}
-
-uint8_t pulseGradientPalettes()
-{
-  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
-    gCurrentPaletteNumber = addmod8( gCurrentPaletteNumber, 1, gGradientPaletteCount);
-    gTargetPalette = gGradientPalettes[ gCurrentPaletteNumber ];
-  }
-
-  EVERY_N_MILLISECONDS(40) {
-    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 16);
-  }
-
-  return _pulse(gCurrentPalette);
-}
-
 uint8_t beatsaw8( accum88 beats_per_minute, uint8_t lowest = 0, uint8_t highest = 255,
                             uint32_t timebase = 0, uint8_t phase_offset = 0)
 {
@@ -610,105 +527,6 @@ uint8_t beatsaw8( accum88 beats_per_minute, uint8_t lowest = 0, uint8_t highest 
   uint8_t scaledbeat = scale8( beatsaw, rangewidth);
   uint8_t result = lowest + scaledbeat;
   return result;
-}
-
-void blurredPixel(uint8_t index, uint8_t blurWidth, CRGBPalette16& palette, uint8_t hue, uint8_t lowest = 0, uint8_t highest = NUM_LEDS)
-{
-  uint8_t val = 255;
-
-  leds[index] = ColorFromPalette( palette, hue, val);
-
-  val /= 2;
-
-  for(int i = 1; i < blurWidth; i++)
-  {
-    uint8_t blurIndex = index + i;
-
-    uint8_t rangewidth = highest - lowest;
-    uint8_t scaledIndex = scale8( blurIndex, rangewidth);
-    uint8_t result = lowest + scaledIndex;
-
-    leds[blurIndex] = ColorFromPalette( palette, hue, val);
-    val /= 2;
-  }
-
-  val = 128;
-
-  for(int i = 1; i < blurWidth; i++)
-  {
-    uint8_t blurIndex = index - i;
-
-    uint8_t rangewidth = highest - lowest;
-    uint8_t scaledIndex = scale8( blurIndex, rangewidth);
-    uint8_t result = lowest + scaledIndex;
-
-    leds[blurIndex] = ColorFromPalette( palette, hue, val);
-    val /= 2;
-  }
-}
-
-uint8_t _rings(CRGBPalette16& palette)
-{
-  const accum88 bpm = 60;
-  static uint8_t sHue = 0;
-
-  uint8_t hue = sHue;
-  uint8_t positionOffset = 0;
-
-  fadeToBlackBy(leds, NUM_LEDS, 255);
-
-  for(uint8_t i = 0; i < ringCount; i++)
-  {
-    uint8_t ringLedCount = ringLedCounts[i];
-    uint8_t ringPosition = beatsaw8(bpm, positionOffset, positionOffset + ringLedCount);
-
-    blurredPixel(ringPosition, 3, palette, hue, positionOffset, positionOffset + ringLedCount);
-
-    /*hue += 256 / ringCount;*/
-    positionOffset += ringLedCount;
-  }
-
-  EVERY_N_MILLISECONDS(125) { sHue++; }
-
-  return 0;
-}
-
-uint8_t ringsHeat()
-{
-  CRGBPalette16 palette = HeatColors_p;
-
-  return _rings(palette);
-}
-
-uint8_t ringsSolid()
-{
-  CRGBPalette16 solid = { solidColor };
-
-  return _rings(solid);
-}
-
-uint8_t ringsRainbow()
-{
-  return _rings(palettes[0]);
-}
-
-uint8_t ringsPalettes()
-{
-  return _rings(currentPalette);
-}
-
-uint8_t ringsGradientPalettes()
-{
-  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) {
-    gCurrentPaletteNumber = addmod8( gCurrentPaletteNumber, 1, gGradientPaletteCount);
-    gTargetPalette = gGradientPalettes[ gCurrentPaletteNumber ];
-  }
-
-  EVERY_N_MILLISECONDS(40) {
-    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 16);
-  }
-
-  return _rings(gCurrentPalette);
 }
 
 uint8_t colorWaves()
