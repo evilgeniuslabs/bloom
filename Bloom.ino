@@ -93,7 +93,7 @@ CRGBPalette16 targetPalette = palettes[paletteIndex];
 void setup()
 {
     FastLED.addLeds<WS2811, TX>(leds, NUM_LEDS);
-    FastLED.setCorrection(TypicalLEDStrip);
+    FastLED.setCorrection(Typical8mmPixel);
     FastLED.setBrightness(brightness);
     FastLED.setDither(false);
     fill_solid(leds, NUM_LEDS, CRGB::Black);
@@ -251,7 +251,7 @@ int setBrightness(String args)
     return brightness;
 }
 
-void setColor(String args)
+int setColor(String args)
 {
   char inputStr[12];
   args.toCharArray(inputStr, 12);
@@ -273,7 +273,7 @@ void setColor(String args)
   return 0;
 }
 
-void setPixel(String args)
+int setPixel(String args)
 {
   char inputStr[12];
   args.toCharArray(inputStr, 12);
