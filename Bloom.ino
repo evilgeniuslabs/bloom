@@ -713,7 +713,7 @@ uint8_t cloudTwinkles()
 
 uint8_t rainbowTwinkles()
 {
-  gCurrentPalette = RainbowColors_p; // Blues and whites!
+  gCurrentPalette = RainbowColors_p;
   colortwinkles();
   return 20;
 }
