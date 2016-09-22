@@ -7,6 +7,7 @@ typings/**
 jspm_packages
 link-checker-results.txt
 **/*npm-debug.log.*
+*.js
 *.js.map
 e2e/**/*.js
 e2e/**/*.js.map
