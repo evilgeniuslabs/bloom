@@ -1,0 +1,99 @@
+<form class="form-horizontal">
+
+	<div class="form-group">
+		<span class="col-sm-offset-2 col-sm-8">{{model.status}}</span>
+	</div>
+
+	<div class="form-group">
+		<label for="inputAccessToken" class="col-sm-2 control-label">Access Token</label>
+		<div class="col-sm-6">
+			<div class="input-group">
+				<input [(ngModel)]="model.accessToken" id="inputAccessToken" name="accessToken" class="form-control" placeholder="Access Token"
+				/>
+				<span class="input-group-btn">
+          <button class="btn btn-default" id="btnSave" (click)="save()" [disabled]="model.busy">Save</button>
+        </span>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="inputDevices" class="col-sm-2 control-label">Device</label>
+		<div class="col-sm-6">
+			<div class="input-group">
+				<select class="form-control" [(ngModel)]="model.device" (ngModelChange)="onSelectedDeviceChange($event)" name="device">
+          <option *ngFor="let device of model.devices" [ngValue]="device">{{device.title}}</option>
+        </select>
+				<span class="input-group-btn">
+        <button type="button" class="btn btn-default" (click)="getDevices()" [disabled]="model.busy" aria-label="Refresh Devices">
+          <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+				</button>
+				<button class="btn btn-default" (click)="connect()" [disabled]="model.busy || !model.isDeviceSelected">Connect</button>
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group" *ngIf="model.isDeviceSelected">
+		<div class="col-sm-offset-2 col-sm-6">
+			<p class="form-control-static">
+				<b>Status</b>: <span>{{model.device.status}}</span>
+			</p>
+			<p class="form-control-static">
+				<b>Last heard</b>: <span>{{model.device.last_heard | date:'medium'}}</span>
+			</p>
+		</div>
+	</div>
+
+	<div class="form-group" *ngIf="model.isDeviceSelected">
+		<label class="col-sm-2 control-label">Power</label>
+		<div class="col-sm-6">
+			<div class="btn-group" role="group" aria-label="Power">
+				<button type="button" class="btn btn-default" (click)="powerOn()" [disabled]="model.busy">
+          On
+        </button>
+				<button type="button" class="btn btn-default" (click)="powerOff()" [disabled]="model.busy">
+          Off
+        </button>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group" *ngIf="model.isDeviceSelected">
+		<label for="inputBrightness" class="col-sm-2 control-label">Brightness</label>
+		<div class="col-sm-6">
+			<div class="input-group">
+				<input [(ngModel)]="model.brightness" class="form-control" id="inputBrightness" name="brightness" type="range" step="1" min="2" max="255" [disabled]="model.busy" />
+				<span class="input-group-addon">{{model.brightness | padLeft: "___"}}</span>
+				<span class="input-group-btn">
+          <button class="btn btn-default" id="btnSetBrightness" (click)="setBrightness()" [disabled]="model.busy">Set</button>
+        </span>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group" *ngIf="model.isDeviceSelected">
+		<label for="inputPattern" class="col-sm-2 control-label">Pattern</label>
+		<div class="col-sm-6">
+			<div class="input-group">
+				<select class="form-control" [(ngModel)]="model.pattern" (ngModelChange)="onSelectedPatternChange($event)" name="pattern" [disabled]="model.busy">
+          <option *ngFor="let pattern of model.patterns" [ngValue]="pattern">{{pattern.name}}</option>
+        </select>
+
+				<span class="input-group-btn">
+          <button type="button" class="btn btn-default" id="btnGetPatterns" (click)="getPatterns()" [disabled]="model.busy" aria-label="Refresh Patterns">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+          </button>
+        </span>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-group" *ngIf="model.isDeviceSelected">
+		<label for="inputColor" class="col-sm-2 control-label">Color</label>
+		<div class="col-sm-6">
+			<input type="color" [(ngModel)]="model.color" name="color" class="form-control" id="inputColor" [disabled]="model.busy" (change)="onSelectedColorChange()" />
+		</div>
+	</div>
+
+</form>
